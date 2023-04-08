@@ -10,7 +10,7 @@ function [txt,key] = strencrypt(txt,key,valid)
 %
 %Example:
 % code = strencrypt('MySecret',pi)  %returns '#^o7Yiq)'
-% text = strencrypt(code,-pi)       %return  'MySecret'
+% text = strencrypt(code,-pi)       %returns 'MySecret'
 
 %defaults
 if nargin<2 || isempty(key), key = randi(999999); end %make a random key
