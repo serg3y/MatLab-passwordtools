@@ -1,5 +1,5 @@
 function [user,pass] = uilogin(valid,heading)
-%Show username and password dialogue (hide password).
+%Create username and password dialogue (hides password input).
 % [user,pass] = uilogin        -display dialogue
 % [user,pass] = uilogin(valid)     -allowed characters (default: char(32:126))
 % [user,pass] = uilogin(valid,heading) -dialogue heading (default: 'Login')
@@ -9,6 +9,8 @@ function [user,pass] = uilogin(valid,heading)
 %
 %Example:
 % [user,pass] = uilogin([],'My Program Login')
+%
+%See also: uipassword, strencrypt
 
 if nargin<1 || isempty(valid), valid = char(32:126); end %default charset
 if nargin<2 || isempty(heading), heading = 'Login'; end %default heeding

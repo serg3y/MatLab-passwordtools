@@ -1,8 +1,8 @@
 function [txt,key] = strencrypt(txt,key,valid)
-%Encrypt or decrypt a string using a key and a MatLab number generator.
-% code = strencrypt(text,key)
-% text = strencrypt(code,-key)
-% [code,key] = strencrypt(text)
+%Encrypt or decrypt a string (uses a key and MatLab number generator).
+% code = strencrypt(text,key)     -encrypt a string using a custom key
+% text = strencrypt(code,-key)     -decrypt a string
+% [code,key] = strencrypt(text)     -encrypt using a random key
 %
 %Remarks:
 %-Can be used to store a password or text a *bit* more safely.
@@ -11,6 +11,8 @@ function [txt,key] = strencrypt(txt,key,valid)
 %Example:
 % code = strencrypt('MySecret',pi)  %returns '#^o7Yiq)'
 % text = strencrypt(code,-pi)       %returns 'MySecret'
+%
+%See also: uilogin, uipassword
 
 %defaults
 if nargin<2 || isempty(key), key = randi(999999); end %make a random key
