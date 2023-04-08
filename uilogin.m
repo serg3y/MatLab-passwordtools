@@ -1,14 +1,14 @@
-function [user,pass] = getlogin(valid,heading)
+function [user,pass] = uilogin(valid,heading)
 %Show username and password dialogue (hide password).
-% [user,pass] = getlogin        -display dialogue
-% [user,pass] = getlogin(valid)     -allowed characters (default: char(32:126))
-% [user,pass] = getlogin(valid,heading) -dialogue heading (default: 'Login')
+% [user,pass] = uilogin        -display dialogue
+% [user,pass] = uilogin(valid)     -allowed characters (default: char(32:126))
+% [user,pass] = uilogin(valid,heading) -dialogue heading (default: 'Login')
 %
 %Remarks:
 %-WindowStyle='modal' blocks user interaction with other UI elements.
 %
 %Example:
-% [user,pass] = getlogin([],'My Program Login')
+% [user,pass] = uilogin([],'My Program Login')
 
 if nargin<1 || isempty(valid), valid = char(32:126); end %default charset
 if nargin<2 || isempty(heading), heading = 'Login'; end %default heeding

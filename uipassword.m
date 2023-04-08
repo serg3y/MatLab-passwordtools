@@ -1,14 +1,14 @@
-function pass = getpass(valid,heading)
+function pass = uipassword(valid,heading)
 %Create a dialogue for user to enter password while hiding the input.
-% pass = getpass       -display dialogue
-% pass = getpass(str)    -list of valid characters (default: char(32:126))
-% pass = getpass(str,lbl)  -dialogue heading (default: 'Enter Password')
+% pass = uipassword       -display dialogue
+% pass = uipassword(str)    -list of valid characters (default: char(32:126))
+% pass = uipassword(str,lbl)  -dialogue heading (default: 'Enter Password')
 %
 %Remarks:
 %-WindowStyle='modal' blocks user interaction with other UI elements.
 %
 %Example:
-% pass = getpass('0123456789','Enter PIN') 
+% pass = uipassword('0123456789','Enter PIN') 
 
 if nargin<1 || isempty(valid), valid = char(32:126); end %default charset
 if nargin<2 || isempty(heading), heading = 'Enter password'; end %default heeding
