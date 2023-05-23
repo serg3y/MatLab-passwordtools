@@ -16,28 +16,29 @@ function pass = uipassword(str,lbl)
 if nargin<1 || isempty(str), str = 32:126; end %allowed pass characters
 if nargin<2 || isempty(lbl), lbl = 'Enter password'; end %dialogue heading
 
+%checks
+if ~usejava('awt') %matlab was started with -nojvm flag (ie no java) 
+    disp(lbl)
+    pass = input('Password:','s'); %revert to simple command line queries
+    return
+end
+
+%main
 ScreenSize = get(0,'ScreenSize');
-hfig  = figure(WindowStyle='modal' ,Units='pixels',Position=[(ScreenSize(3:4)-[300 75])/2 300 75],Name=lbl,Resize='off',NumberTitle='off',Menubar='none',Color=[0.9 0.9 0.9],KeyPressFcn=@keypress,CloseRequestFcn=@(~,~)uiresume);
-hpass = uicontrol(hfig,Style='text',Units='pixels',Position=[20 30 260 20],FontSize=10,BackGroundColor='w');
-hwarn = uicontrol(hfig,Style='text',Units='pixels',Position=[50  2 200 20],FontSize=10,BackGroundColor=[0.9 0.9 0.9]);
+hFig  = figure(WindowStyle='modal' ,Units='pixels',Position=[(ScreenSize(3:4)-[300 75])/2 300 75],Name=lbl,Resize='off',NumberTitle='off',Menubar='none',Color=[0.9 0.9 0.9],KeyPressFcn=@KeyPress,CloseRequestFcn=@(~,~)uiresume);
+hPass = uicontrol(hFig,Style='text',Units='pixels',Position=[20 30 260 20],FontSize=10,BackGroundColor='w');
 pass = ''; %init
 uiwait %hold program execution
-delete(hfig) %clean up
+delete(hFig) %clean up
 
-    function keypress(~,event)
+    function KeyPress(~,event)
         if event.Key=="backspace"
             pass = pass(1:end-1); %shorten password
         elseif contains(event.Key,{'return' 'escape'}) %Enter or ESC was pressed
-            uiresume, return %exit
-        elseif event.Key=="shift"
-            %do nothing
+            uiresume, return %done
         elseif contains(event.Character,num2cell(char(str)))
             pass(end+1) = event.Character; %append key to password
-        else
-            hwarn.String = 'Invalid character'; %warn user
-            pause(0.5);
-            hwarn.String = '';
         end
-        hpass.String = repmat(char(8226),size(pass)); %display dots instead of password
+        hPass.String = repmat(char(8226),size(pass)); %display dots instead of password
     end
 end
