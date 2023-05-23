@@ -6,9 +6,10 @@ function pass = uipassword(str,lbl)
 %
 %Remarks:
 %-WindowStyle='modal' blocks user interaction with other UI elements.
+%-If Esc is pressed empty char is returned.
 %
 %Example:
-% pass = uipassword('0123456789','Enter PIN') 
+% pass = uipassword('0123456789','Enter PIN')
 %
 %See also: uilogin, strencrypt
 
@@ -34,8 +35,11 @@ delete(hFig) %clean up
     function KeyPress(~,event)
         if event.Key=="backspace"
             pass = pass(1:end-1); %shorten password
-        elseif contains(event.Key,{'return' 'escape'}) %Enter or ESC was pressed
+        elseif event.Key=="return"
             uiresume, return %done
+        elseif event.Key=="escape"
+            pass = '';
+            uiresume, return %abort
         elseif contains(event.Character,num2cell(char(str)))
             pass(end+1) = event.Character; %append key to password
         end

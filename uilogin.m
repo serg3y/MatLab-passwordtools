@@ -7,6 +7,7 @@ function [user,pass] = uilogin(str,lbl,user)
 %
 %Remarks:
 %-WindowStyle='modal' blocks user interaction with other UI elements.
+%-If Esc is pressed empty char is returned.
 %
 %Example:
 % [user,pass] = uilogin([],'My Program Login')
@@ -31,7 +32,7 @@ sz = get(0,'ScreenSize');
 hFig  = figure(WindowStyle='modal' ,Position=[(sz(3:4)-[350 100])/2 350 100],Name=lbl,Resize='off',NumberTitle='off',Menubar='none',Color=[0.9 0.9 0.9],CloseRequestFcn=@(~,~)uiresume);
 hUser = uicontrol(hFig,Style='edit',Position=[80 60 250 20],KeyPressFcn=@userKeyPress,FontSize=10,BackGroundColor='w',String=user);
 hPass = uicontrol(hFig,Style='text',Position=[80 30 250 20],ButtonDownFcn=@passClick,FontSize=10,BackGroundColor='w',Enable='Inactive');
-hDumy = uicontrol(hFig,Style='push',Position=[ 0  0   0  0],KeyPressFcn=@KeyPress); %button represents password text box, to simulate tab behaviour
+hDumy = uicontrol(hFig,Style='push',Position=[ 0  0   0  0],KeyPressFcn=@passKeyPress); %button represents password text box, to simulate tab behaviour
 annotation(hFig,'textbox',Units='pixels',Position=[00 60 80 20],String='Username',EdgeColor='n',VerticalAlignment='middle',HorizontalAlignment='right')
 annotation(hFig,'textbox',Units='pixels',Position=[00 30 80 20],String='Password',EdgeColor='n',VerticalAlignment='middle',HorizontalAlignment='right')
 pass = ''; %init password
@@ -45,15 +46,21 @@ delete(hFig) %clean up
         uicontrol(hDumy)
     end
     function userKeyPress(~,event)
-        if contains(event.Key,{'return' 'escape'})
-            uiresume, return %finish
+        if event.Key=="return"
+            uiresume, return %done
+        elseif event.Key=="escape"
+            hUser.String = ''; pass = '';
+            uiresume, return %abort
         end
     end
-    function KeyPress(~,event)
+    function passKeyPress(~,event)
         if event.Key=="backspace"
             pass = pass(1:end-1); %shorten password
-        elseif contains(event.Key,{'return' 'escape'}) %Enter or ESC was pressed
+        elseif event.Key=="return"
             uiresume, return %done
+        elseif event.Key=="escape"
+            hUser.String = ''; pass = '';
+            uiresume, return %abort
         elseif contains(event.Character,num2cell(char(str)))
             pass(end+1) = event.Character; %append key to password
         end
