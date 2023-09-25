@@ -1,8 +1,10 @@
-function pass = uipassword(str,lbl)
+function pass = uipassword(str,lbl,block)
 %Create password dialogue (hide password input).
-% pass = uipassword       -display dialogue
-% pass = uipassword(str)    -allowed pass characters (default:[32:126])
-% pass = uipassword(str,lbl)  -dialogue heading (default:'Enter Password')
+% pass = uipassword           -display dialogue
+% pass = uipassword(str)        -allowed pass characters (default:[32:126])
+% pass = uipassword(str,lbl)      -dialogue heading (default:'Password')
+% pass = uipassword(str,lbl,block)  -if true blocks user interaction
+%                                    with other windows (default:0)
 %
 %Remarks:
 %-WindowStyle='modal' blocks user interaction with other UI elements.
@@ -13,35 +15,46 @@ function pass = uipassword(str,lbl)
 %
 %See also: uilogin, strencrypt
 
-%defaults
+% Defaults
 if nargin<1 || isempty(str), str = 32:126; end %allowed pass characters
 if nargin<2 || isempty(lbl), lbl = 'Enter password'; end %dialogue heading
+if nargin>=3 && isscalar(block) && block
+    WinStyle = 'modal'; %blocks user interaction with other windows
+else
+    WinStyle = 'normal';
+end
 
-%checks
+% Checks
 if ~usejava('awt') %matlab was started with -nojvm flag (ie no java) 
     disp(lbl)
     pass = input('Password:','s'); %revert to simple command line queries
     return
 end
 
-%main
-ScreenSize = get(0,'ScreenSize');
-hFig  = figure(WindowStyle='modal' ,Units='pixels',Position=[(ScreenSize(3:4)-[300 75])/2 300 75],Name=lbl,Resize='off',NumberTitle='off',Menubar='none',Color=[0.9 0.9 0.9],KeyPressFcn=@KeyPress,CloseRequestFcn=@(~,~)uiresume);
+% Main
+screenWH = get(0).ScreenSize(3:4);
+hFig  = figure(WindowStyle=WinStyle,Units='pixels',Position=[(screenWH-[300 75])/2 300 75],Name=lbl,Resize='off',NumberTitle='off',Menubar='none',Color=[0.9 0.9 0.9],KeyPressFcn=@KeyPress,CloseRequestFcn=@(~,~)uiresume);
+[~]   = uicontrol(hFig,Style='push',Position=[16 26 268 28],Enable='off'); %add a border
 hPass = uicontrol(hFig,Style='text',Units='pixels',Position=[20 30 260 20],FontSize=10,BackGroundColor='w');
 pass = ''; %init
 uiwait %hold program execution
 delete(hFig) %clean up
 
+% Callbacks
     function KeyPress(~,event)
-        if event.Key=="backspace"
+        if isequal(event.Modifier,{'control'}) && isequal(event.Key,'v') %paste from clipboard
+            pass = clipboard('paste');
+        elseif event.Key=="backspace"
             pass = pass(1:end-1); %shorten password
-        elseif event.Key=="return"
-            uiresume, return %done
-        elseif event.Key=="escape"
+        elseif event.Key=="return" %done
+            uiresume
+            return
+        elseif event.Key=="escape" %abort
             pass = '';
-            uiresume, return %abort
-        elseif contains(event.Character,num2cell(char(str)))
-            pass(end+1) = event.Character; %append key to password
+            uiresume
+            return
+        elseif contains(event.Character,num2cell(char(str))) %append key to password
+            pass(end+1) = event.Character;
         end
         hPass.String = repmat(char(8226),size(pass)); %display dots instead of password
     end
