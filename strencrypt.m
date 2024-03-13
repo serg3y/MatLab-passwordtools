@@ -1,36 +1,41 @@
-function [txt,key] = strencrypt(txt,key,valid)
-%Encrypt or decrypt a string (uses a key and MatLab number generator).
-% code = strencrypt(text,key)     -encrypt a string using a custom key
-% text = strencrypt(code,-key)     -decrypt a string
-% [code,key] = strencrypt(text)     -encrypt using a random key
+function [txt, key] = strencrypt(txt, key, valid)
+% Encrypt or decrypt a string (uses a key and MATLAB number generator).
 %
-%Remarks:
-%-Can be used to store a password or text a *bit* more safely.
-%-The same MatLab number generator needs to be used to encrypt and decrypt.
+% txt = strencrypt(text, key)     - Encrypt a string using a custom key
+% txt = strencrypt(code, -key)     - Decrypt a string
+% [code, key] = strencrypt(text)    - Encrypt using a random key
 %
-%Example:
-% code = strencrypt('MySecret',pi)  %returns '#^o7Yiq)'
-% text = strencrypt(code,-pi)       %returns 'MySecret'
+% Remarks:
+% - Can be used to store a password or text a *bit* more safely.
+% - The same MATLAB number generator needs to be used to encrypt and decrypt.
 %
-%See also: uilogin, uipassword
+% Example:
+% code = strencrypt('MySecret', pi)  % Returns '#^o7Yiq)'
+% text = strencrypt(code, -pi)       % Returns 'MySecret'
+%
+% See also: uilogin, uipassword
 
-%defaults
-if nargin<2 || isempty(key), key = randi(999999); end %make a random key
-if nargin<3 || isempty(valid), valid = char(32:126); end
-
-%init
-if ~all(ismember(txt,valid),'all')
-    error('Encountered invalid characters: "%s"',setdiff(txt,valid)) %check
+% Defaults
+if nargin < 2 || isempty(key)
+    key = randi(999999); % Make a random key
 end
-n = numel(valid);            %number of allowed characters
-txt2num(valid) = 1:n;        %lookup to convert ASCII to numbers
-num2txt(1:n) = valid;        %lookup to convert numbers to ASCII
-s = rng(abs(key),'twister'); %use key as seed to generate numbers
-rnd = randi(n,size(txt));    %generate positive random integers, 1 to n
-rng(s);                      %return number generator to previous state
+if nargin < 3 || isempty(valid)
+    valid = char(32:126);
+end
 
-%main
-num = txt2num(txt);          %convert text to numbers
-rnd = sign(key)*rnd;         %sign indicates encryption vs decryption
-num = mod(num+rnd-1,n)+1;    %apply offsets and wrap values (use base 1)
-txt = num2txt(num);          %convert back to text
+% Initialization
+if ~all(ismember(txt, valid), 'all')
+    error('Encountered invalid characters: "%s"', setdiff(txt, valid)); % Check
+end
+n = numel(valid);            % Number of allowed characters
+txt2num(valid) = 1:n;        % Lookup to convert ASCII to numbers
+num2txt(1:n) = valid;        % Lookup to convert numbers to ASCII
+s = rng(abs(key), 'twister');% Use key as seed to generate numbers
+rnd = randi(n, size(txt));   % Generate positive random integers, 1 to n
+rng(s);                      % Return number generator to previous state
+
+% Main
+num = txt2num(txt);          % Convert text to numbers
+rnd = sign(key) * rnd;       % Sign indicates encryption vs decryption
+num = mod(num + rnd - 1, n) + 1; % Apply offsets and wrap values (use base 1)
+txt = num2txt(num);          % Convert back to text
